@@ -2,8 +2,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import About from '../about/about'
-import { GridPattern } from '@/components/ui/box-pattern'
-import { cn } from '@/lib/utils'
 import { YouTube } from '@/lib/icons'
 
 const HeroSection = () => {
