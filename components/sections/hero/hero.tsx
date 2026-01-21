@@ -1,10 +1,12 @@
+'use client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import About from '../about/about'
 import { YouTube } from '@/lib/icons'
-
+import { useRouter } from 'next/navigation'
 const HeroSection = () => {
+    const router = useRouter()
     return (
         <section className='relative w-full'>
             <div className='fixed inset-0 z-0 bg-background'>
@@ -39,6 +41,7 @@ const HeroSection = () => {
                                 <Button
                                     variant='default'
                                     className='w-full text-white px-6 py-6 text-base transition-all duration-300 hover:scale-105 sm:w-auto sm:text-lg'
+                                    onClick={() => router.push('/dashboard')}
                                 >
                                     Start Learning
                                 </Button>
