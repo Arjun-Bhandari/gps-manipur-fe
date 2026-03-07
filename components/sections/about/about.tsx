@@ -1,15 +1,7 @@
 import React from 'react'
 
 const About = () => {
-    const youtubeUrl =
-    'https://www.youtube.com/embed/5NjUaZces3w' +
-    '?cc_load_policy=0' +
-    '&cc_lang_pref=en' +
-    '&hl=en' +
-    '&autoplay=0' +
-    '&mute=0' +
-    '&controls=1' +
-    '&rel=0'
+    const youtubeUrl = 'https://www.youtube.com/embed/5NjUaZces3w'
  
   return (
     <section className='w-full py-12 sm:py-16 md:py-20 lg:py-24'>
@@ -24,19 +16,17 @@ const About = () => {
         </div>
 
         <div className='relative w-full max-w-3xl mx-auto overflow-hidden rounded-2xl border-2 border-secondary shadow-2xl transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] bg-secondary p-1'>
-         
-          
           {/* Video container with aspect ratio */}
           <div className='relative aspect-video w-full rounded-2xl'>
             <iframe
               src={youtubeUrl}
               title='GPS Manipur Platform Introduction'
               allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+              referrerPolicy='strict-origin-when-cross-origin'
               allowFullScreen
               className='h-full w-full border-0 rounded-2xl'
               loading='lazy'
             />
-         
           </div>
 
           {/* Subtle glow effect */}
@@ -47,4 +37,5 @@ const About = () => {
   )
 }
 
-export default About     
+export default About
+
