@@ -9,17 +9,12 @@ import Cta from '@/components/sections/cta/cta'
 const Page = () => {
   return (
     <>
-      {/* Fixed Navbar */}
-      <div className='fixed left-0 right-0 top-0 z-50 w-full'>
-        <Container>
-          <Navbar />
-        </Container>
-      </div>
+      <Navbar />
       
       <HeroSection />
       <WhyGps />
       <Cta />
-          <Footer />
+      <Footer />
        
     </>
   )

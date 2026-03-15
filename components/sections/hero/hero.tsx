@@ -5,58 +5,61 @@ import Image from 'next/image'
 import About from '../about/about'
 import { YouTube } from '@/lib/icons'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 const HeroSection = () => {
     const router = useRouter()
     return (
         <section className='relative w-full'>
-            <div className='fixed inset-0 z-0 bg-background'>
-                <div 
-                    className='absolute inset-0 pointer-events-none'
-                    style={{
-                        background: 'radial-gradient(ellipse 1200px 800px at 50% 0%, oklch(0.61 0.11 222 / 0.15) 0%, oklch(0.61 0.11 222 / 0.12) 8%, oklch(0.61 0.11 222 / 0.08) 18%, oklch(0.61 0.11 222 / 0.05) 30%, oklch(0.61 0.11 222 / 0.03) 45%, oklch(0.61 0.11 222 / 0.015) 60%, transparent 75%)',
-                    }}
-                />
-                <div 
-                    className='absolute inset-0 pointer-events-none'
-                    style={{
-                        background: 'radial-gradient(ellipse 1000px 600px at 50% 5%, oklch(0.61 0.11 222 / 0.1) 0%, oklch(0.61 0.11 222 / 0.06) 15%, oklch(0.61 0.11 222 / 0.03) 35%, transparent 55%)',
-                    }}
-                />
-            </div>
+
             <div className='relative z-10'>
-                <div className='container mx-auto px-4 pt-32 pb-6 sm:px-6 sm:pt-32 md:pt-24 lg:pt-20'>
-                    <div className='flex w-full flex-col gap-6 sm:gap-8 md:gap-10 lg:flex-row lg:items-center lg:justify-between'>
-                        {/* Left Content - Perfectly Aligned with Navbar */}
-                        <div className='w-full space-y-4 sm:space-y-5 md:space-y-6 lg:w-1/2'>
-                            <Badge className='border border-primary/30 bg-primary/20 px-4 py-4 text-sm font-semibold text-white backdrop-blur-md sm:text-base md:text-lg shadow-lg'>
+                <div className='container mx-auto px-4 pt-12 pb-8 sm:pt-16 md:pt-20'>
+                    <div className='flex w-full flex-col gap-8 lg:flex-row lg:items-center lg:justify-between'>
+
+                        <div className='w-full space-y-5 lg:w-3/5'>
+                            <div className="inline-flex items-center gap-2 border border-primary/20 bg-primary/5 px-4 py-1.5 text-[10px] font-bold text-primary backdrop-blur-md rounded-full">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                </span>
                                 Trusted by 4k+ Students 🚀
-                            </Badge>
-                            <h1 className='text-xl font-bold leading-tight sm:text-2xl md:text-2xl lg:text-4xl xl:text-5xl'>
-                             Board's & Competitive Exam Prep
+                            </div>
+
+                            <h1 className='text-3xl font-black leading-[1.1] tracking-tighter sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl'>
+                                <span className="block md:inline-block md:whitespace-nowrap">Board's & Competitive</span>
+                                <span className="block mt-1 bg-linear-to-r from-primary via-primary/80 to-primary/40 bg-clip-text text-transparent">
+                                    Exam Prep
+                                </span>
                             </h1>
-                            <p className='max-w-prose text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl'>
-                                GPS Manipur is a centralized education platform for 10th and 12th board students and competitive exam aspirants, with curated notes, PYQs, solved PYQs, and exam guides
+
+                            <p className='max-w-xl text-lg sm:text-xl text-muted-foreground leading-relaxed font-medium'>
+                                Get access to comprehensive video tutorials, solved PYQs, and expert guidance. Start your success journey with GPS Manipur today.
                             </p>
-                            <div className='flex flex-col gap-3 pt-2 sm:flex-row'>
+
+                            <div className='flex flex-col gap-4 pt-6 sm:flex-row'>
                                 <Button
                                     variant='default'
-                                    className='w-full text-white px-6 py-6 text-base transition-all duration-300 hover:scale-105 sm:w-auto sm:text-lg'
+                                    className='group w-full h-14 px-8 text-lg font-bold transition-all duration-500 rounded-full shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.05] active:scale-[0.98] sm:w-auto bg-primary text-primary-foreground'
                                     onClick={() => router.push('/dashboard')}
                                 >
                                     Start Learning
+                                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                                 </Button>
-                                <Button
-                                    variant='outline'
-                                    className='w-full px-6 py-6 text-base transition-all duration-300 hover:scale-105 sm:w-auto sm:text-lg'
-                                >
-                                    <YouTube className='h-5 w-5'/>Subscribe to YouTube Channel
-                                </Button>
+                                <Link href="https://www.youtube.com/@gpsmanipur " target='_blank' className="w-full sm:w-auto">
+                                    <Button
+                                        variant='outline'
+                                        className='w-full h-14 px-8 text-lg font-semibold transition-all duration-300 rounded-full border-border/50 hover:bg-secondary hover:border-primary/50 group sm:w-auto'
+                                    >
+                                        <YouTube className='h-5 w-5 mr-3 text-red-500 group-hover:scale-110 transition-transform' />
+                                        Subscribe
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
 
                         {/* Right Image */}
                         <div className='flex w-full justify-center lg:w-1/2 lg:justify-end'>
-                            <div className='relative w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[400px] mask-b-from-80% mask-radial-[60%_60%] mask-radial-from-70%'>
+                            <div className='relative w-full max-w-70 sm:max-w-80 md:max-w-90 lg:max-w-100 mask-b-from-80% mask-radial-[60%_60%] mask-radial-from-70%'>
                                 <Image
                                     src='/hero.png'
                                     alt='Student reading a book'
@@ -70,7 +73,7 @@ const HeroSection = () => {
                         </div>
                     </div>
                 </div>
-          
+
                 <div className='relative z-10'>
                     <About />
                 </div>

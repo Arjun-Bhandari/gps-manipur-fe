@@ -45,7 +45,7 @@ const WhyGps = () => {
       link: '/guides',
       linkText: 'Explore Guides →',
       icon: (
-<SubjectsGuides className='w-12 h-12' />
+        <SubjectsGuides className='w-12 h-12' />
       ),
       color: '',
       colSpan: 'col-span-1',
@@ -71,7 +71,7 @@ const WhyGps = () => {
       link: '/notes',
       linkText: 'Browse Notes →',
       icon: (
-       <Notes className='w-12 h-12' />
+        <Notes className='w-12 h-12' />
       ),
       color: '',
       colSpan: 'col-span-1',
@@ -84,7 +84,7 @@ const WhyGps = () => {
       link: '/exam-guide',
       linkText: 'Get Started →',
       icon: (
-      <ExamGuide className='w-12 h-12' />
+        <ExamGuide className='w-12 h-12' />
       ),
       color: '',
       colSpan: 'col-span-1 sm:col-span-2',
@@ -96,7 +96,7 @@ const WhyGps = () => {
     <section className='w-full relative z-10 py-12 sm:py-16 md:py-20 lg:py-24'>
       <div className='container mx-auto px-4 sm:px-6'>
         <div className='mb-8 sm:mb-12'>
-        <h2 className='text-xl font-bold sm:text-xl md:text-2xl lg:text-3xl'>
+          <h2 className='text-xl font-bold sm:text-xl md:text-2xl lg:text-3xl'>
             Why GPS Manipur?
           </h2>
           <p className='mt-4 text-base text-muted-foreground sm:text-lg md:text-xl'>
@@ -104,8 +104,7 @@ const WhyGps = () => {
           </p>
         </div>
 
-        {/* Bento Grid */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  p-4 rounded-md shadow-2xl shadow-primary/20 '>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {features.map((feature) => (
             <Link
               key={feature.id}
@@ -113,66 +112,49 @@ const WhyGps = () => {
               onMouseEnter={() => setHoveredCard(feature.id)}
               onMouseLeave={() => setHoveredCard(null)}
               className={cn(
-                'group relative overflow-hidden  border border-border transition-all duration-300',
+                'group relative flex flex-col overflow-hidden bg-card mac-border rounded-[2rem] p-8 transition-all duration-500 ease-out',
                 feature.colSpan,
                 feature.rowSpan,
                 hoveredCard === feature.id
-                  ? ' shadow-2xl shadow-primary/20 ring-2 ring-primary/50'
-                  : hoveredCard
-                    ? 'opacity-60 '
-                    : ' hover:shadow-lg'
+                  ? 'shadow-mac-lg -translate-y-1'
+                  : 'shadow-mac'
               )}
             >
-                
-              <Card className='h-full border rounded-none bg-transparent p-6'>
-                <CardHeader className='space-y-4 p-0'>
-                  <div className='flex items-start justify-between'>
-                    <div
-                      className={cn(
-                        'rounded-lg p-3 transition-all duration-300',
-                        feature.color,
-                        hoveredCard === feature.id ? 'scale-110 ' : ''
-                      )}
-                    >
-                      <div className='text-white'>{feature.icon}</div>
-                    </div>
-                  </div>
-                  <div className='space-y-2'>
-                    <CardTitle className='text-lg font-bold sm:text-xl'>
-                      {feature.title}
-                    </CardTitle>
-                    <CardDescription className='text-sm sm:text-base leading-relaxed'>
-                      {feature.description}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className='p-0 pt-4'>
-                  <div className='flex items-center gap-2 text-sm font-medium text-primary transition-all duration-300 group-hover:gap-3'>
-                    {feature.linkText}
-                    <svg
-                      className='w-4 h-4 transition-transform duration-300 group-hover:translate-x-1'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 5l7 7-7 7'
-                      />
-                    </svg>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Hover Glow Effect */}
-              <div
-                className={cn(
-                  'absolute inset-0 -z-10 rounded-xl bg-linear-to-br from-primary/0 via-primary/0 to-primary/0 transition-all duration-300',
-                  hoveredCard === feature.id && 'from-primary/10 via-primary/5 to-primary/0'
-                )}
-              />
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                {feature.icon}
+              </div>
+
+              <div className='flex grow flex-col space-y-3'>
+                <h3 className='text-xl font-bold tracking-tight sm:text-2xl'>
+                  {feature.title}
+                </h3>
+                <p className='text-base leading-relaxed text-muted-foreground'>
+                  {feature.description}
+                </p>
+              </div>
+
+              <div className='mt-8 flex items-center gap-2 text-sm font-semibold text-primary'>
+                <span className="relative">
+                  {feature.linkText}
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
+                </span>
+                <svg
+                  className='w-4 h-4 transition-transform duration-300 group-hover:translate-x-1'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M9 5l7 7-7 7'
+                  />
+                </svg>
+              </div>
+
+              {/* Subtle Gradient Overlay */}
+              <div className="absolute inset-0 pointer-events-none bg-radial-gradient(circle at 50% 0%, var(--primary)/5 0%, transparent 70%) opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </Link>
           ))}
         </div>
