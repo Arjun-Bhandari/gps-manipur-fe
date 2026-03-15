@@ -7,65 +7,59 @@ const Cta = () => {
   return (
     <section className='w-full relative z-10 py-6 sm:py-8 md:py-10 lg:py-12'>
       <div className='container mx-auto px-4 sm:px-6'>
-        <div className='relative overflow-hidden rounded-2xl border border-secondary/50  backdrop-blur-sm p-8 sm:p-12 md:p-16 lg:p-20'>
-          <div className='relative z-10 flex flex-col items-center text-center space-y-6 sm:space-y-8'>
-        
+        <div className='relative overflow-hidden rounded-[2.5rem] mac-border bg-card shadow-mac-lg p-8 sm:p-12 md:p-16 lg:p-20'>
+          {/* Decorative background element */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+
+          <div className='relative z-10 flex flex-col items-center text-center space-y-8 sm:space-y-10'>
+
             <div className='space-y-4 sm:space-y-6'>
-              <h2 className='text-3xl font-bold leading-tight sm:text-4xl md:text-5xl lg:text-6xl'>
-                Guide At Your{' '}
-                <span className='bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent'>
-                  Finger Tip?
+              <h2 className='text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl'>
+                Your Guide At Your{' '}
+                <span className='text-primary'>
+                  Finger Tips
                 </span>
               </h2>
-              <h3 className='text-2xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl text-muted-foreground'>
-                Start Learning
+              <h3 className='text-xl font-medium sm:text-2xl md:text-3xl text-muted-foreground'>
+                Join thousands of students mastering exams today.
               </h3>
             </div>
 
-            {/* Catchy Text */}
-            <p className='max-w-2xl text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed'>
-              Join thousands of students mastering board exams and competitive tests with our comprehensive video tutorials, solved PYQs, and expert guidance. Your success journey starts here!
+            <p className='max-w-150 text-lg sm:text-xl text-muted-foreground leading-relaxed'>
+              Get access to comprehensive video tutorials, solved PYQs, and expert guidance. Start your success journey with GPS Manipur.
             </p>
 
-            {/* YouTube Button */}
-            <Button
-              asChild
-              size='lg'
-              className={cn(
-                'group relative h-14 px-8 text-base sm:text-lg font-semibold',
-                'bg-primary hover:bg-primary/90 text-white',
-                'shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40',
-                'transition-all duration-300 hover:scale-105'
-              )}
-            >
-              <a
-                href='https://youtube.com/@gpsmanipur'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='flex items-center gap-3'
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <Button
+                asChild
+                size='lg'
+                className='rounded-full h-14 px-10 text-lg font-semibold shadow-xl shadow-primary/20 transition-all duration-300 hover:scale-105 active:scale-95'
               >
-                <YouTube className='w-6 h-6 transition-transform duration-300 group-hover:scale-110' />
-                <span>Subscribe to YouTube Channel</span>
-                <svg
-                  className='w-5 h-5 transition-transform duration-300 group-hover:translate-x-1'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
+                <a
+                  href='https://youtube.com/@gpsmanipur'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center gap-3'
                 >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M9 5l7 7-7 7'
-                  />
-                </svg>
-              </a>
-            </Button>
+                  <YouTube className='w-6 h-6' />
+                  <span>Subscribe Now</span>
+                </a>
+              </Button>
 
-            {/* Additional Info */}
-            <p className='text-sm text-muted-foreground/80'>
-              🎥 Free video lessons • 📚 Solved PYQs • 📖 Complete guides • ✨ Expert tips
-            </p>
+              <Button variant="ghost" className="rounded-full h-14 px-8 text-lg font-medium">
+                View Courses
+              </Button>
+            </div>
+
+            <div className='flex flex-wrap justify-center gap-x-8 gap-y-4 pt-4 border-t border-border/50 w-full max-w-2xl'>
+              {['Free Video Lessons', 'Solved PYQs', 'Complete Guides', 'Expert Tips'].map((item) => (
+                <div key={item} className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary/40" />
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
