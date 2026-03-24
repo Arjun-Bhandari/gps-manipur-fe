@@ -45,20 +45,8 @@ interface NavItem {
 
 // This is sample data.
 const data: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-    role: string
-  }
   navMain: NavItem[]
 } = {
-  user: {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar: "https://github.com/shadcn.png",
-    role: "admin", // Simulated role
-  },
   navMain: [
     {
       title: "Overview",
@@ -125,12 +113,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const [isArticlesOpen, setIsArticlesOpen] = React.useState(true)
   const authUser = useAuthStore((state) => state.user)
+  const checkSession = useAuthStore((state) => state.checkSession)
+
+  React.useEffect(() => {
+    if (!authUser) {
+      void checkSession()
+    }
+  }, [authUser, checkSession])
 
   const user = {
-    name: authUser?.name || "Guest User",
-    email: authUser?.email || "guest@gps-manipur.com",
-    avatar: authUser?.image || data.user.avatar,
-    role: authUser?.role || "user",
+    name: authUser?.name || "",
+    email: authUser?.email || "",
+    avatar: authUser?.image || "",
+    role: (authUser?.role || "user").toLowerCase(),
   }
 
   return (
@@ -139,7 +134,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Header />
       </SidebarHeader>
       <SidebarContent>
-        {data.navMain.filter(item => !item.roleRequired || item.roleRequired === user.role).map((item) => {
+        {data.navMain.filter(item => !item.roleRequired || item.roleRequired.toLowerCase() === user.role).map((item) => {
           const isArticles = item.title === "Articles"
           const isActive = pathname === item.url || (item.items?.some(child => pathname === child.url))
 
@@ -165,7 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   {isArticlesOpen && (
                     <SidebarGroupContent>
                       <SidebarMenu>
-                        {item.items?.filter(child => !child.roleRequired || child.roleRequired === user.role).map((child) => {
+                        {item.items?.filter(child => !child.roleRequired || child.roleRequired.toLowerCase() === user.role).map((child) => {
                           const isChildActive = pathname === child.url
                           return (
                             <SidebarMenuItem key={child.title}>
@@ -218,7 +213,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        {authUser ? <NavUser user={user} /> : null}
       </SidebarFooter>
       <SidebarRail />
 

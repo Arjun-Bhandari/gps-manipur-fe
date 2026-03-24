@@ -2,7 +2,6 @@
 
 import {
     BadgeCheck,
-    Bell,
     ChevronsUpDown,
     CreditCard,
     LogOut,
@@ -45,6 +44,18 @@ export function NavUser({
     const logout = useAuthStore((state) => state.logout)
     const router = useRouter()
 
+    const userInitials = (() => {
+        const source = user.name || user.email
+        if (!source) return "U"
+
+        const parts = source.trim().split(/\s+/).filter(Boolean)
+        if (parts.length === 1) {
+            return parts[0].slice(0, 2).toUpperCase()
+        }
+
+        return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase()
+    })()
+
     const handleLogout = async () => {
         await logout()
         router.push("/login")
@@ -61,7 +72,7 @@ export function NavUser({
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-medium">{user.name}</span>
@@ -80,7 +91,7 @@ export function NavUser({
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
                                     <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                    <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-medium">{user.name}</span>

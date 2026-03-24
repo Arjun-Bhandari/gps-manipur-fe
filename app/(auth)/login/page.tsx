@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { authService } from "@/lib/services/auth/auth";
 import { useAuthStore } from "@/lib/store/authStore";
 import FullLogo from "@/components/fulllogo";
+import { toast } from "sonner";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -22,24 +23,39 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+    const [lastUsedProvider, setLastUsedProvider] = useState<"google" | "email-otp" | null>(null);
+
+    const extractErrorMessage = (err: any, fallback: string) => {
+        if (err?.message) return err.message;
+        if (err?.response?.data?.message) return err.response.data.message;
+        return fallback;
+    };
 
     // Check callback status
     useEffect(() => {
+        setLastUsedProvider(authService.getLastUsedProvider());
+
         const provider = searchParams.get("provider");
         if (provider === "google") {
             setIsGoogleLoading(true);
             authService.getSession().then((response) => {
                 if (response?.session) {
                     authService.setLastUsedProvider("google");
+                    setLastUsedProvider("google");
                     setUser(response.user);
+                    toast.success("Google login successful.");
                     router.push(response.user.isOnboarded ? "/dashboard" : "/onboarding");
                 } else {
                     setIsGoogleLoading(false);
-                    setError("Google sign-in failed or was cancelled.");
+                    const message = "Google sign-in failed or was cancelled.";
+                    setError(message);
+                    toast.error(message);
                 }
-            }).catch(() => {
+            }).catch((err: any) => {
                 setIsGoogleLoading(false);
-                setError("An error occurred verifying your session.");
+                const message = extractErrorMessage(err, "An error occurred verifying your session.");
+                setError(message);
+                toast.error(message);
             });
         }
     }, [searchParams, router]);
@@ -51,8 +67,12 @@ export default function LoginPage() {
         try {
             await authService.signWithOtp({ email, type: "sign-in" });
             setStep("otp");
+            setLastUsedProvider("email-otp");
+            toast.success("Verification code sent to your email.");
         } catch (err: any) {
-            setError(err.message || "Failed to send OTP. Please try again.");
+            const message = extractErrorMessage(err, "Failed to send OTP. Please try again.");
+            setError(message);
+            toast.error(message);
         } finally {
             setIsLoading(false);
         }
@@ -70,6 +90,7 @@ export default function LoginPage() {
             // The authService auto-sets the last used provider to email-otp internally.
             if (response?.user) {
                 setUser(response.user);
+                toast.success("Login successful.");
                 if (!response.user.isOnboarded) {
                     router.push("/onboarding");
                 } else {
@@ -77,7 +98,9 @@ export default function LoginPage() {
                 }
             }
         } catch (err: any) {
-            setError(err.message || "Invalid OTP. Please try again.");
+            const message = extractErrorMessage(err, "Invalid OTP. Please try again.");
+            setError(message);
+            toast.error(message);
         } finally {
             setIsLoading(false);
         }
@@ -89,12 +112,12 @@ export default function LoginPage() {
         try {
             await authService.googleLogin(`${window.location.origin}/login?provider=google`);
         } catch (err: any) {
-            setError(err.message || "Could not initiate Google sign in.");
+            const message = extractErrorMessage(err, "Could not initiate Google sign in.");
+            setError(message);
+            toast.error(message);
             setIsGoogleLoading(false);
         }
     };
-
-    const lastUsedProvider = authService.getLastUsedProvider();
 
     return (
         <div className="flex min-h-screen items-stretch justify-center bg-background md:flex-row flex-col">

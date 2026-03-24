@@ -28,6 +28,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { NavUser } from "./nav-user"
+import { useAuthStore } from "@/lib/store/authStore"
 
 const data = {
   navMain: [
@@ -66,6 +67,20 @@ const data = {
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
+  const authUser = useAuthStore((state) => state.user)
+  const checkSession = useAuthStore((state) => state.checkSession)
+
+  React.useEffect(() => {
+    if (!authUser) {
+      void checkSession()
+    }
+  }, [authUser, checkSession])
+
+  const user = {
+    name: authUser?.name || "",
+    email: authUser?.email || "",
+    avatar: authUser?.image || "",
+  }
 
   return (
     <Sidebar {...props}>
@@ -103,11 +118,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{
-          name: "Admin User",
-          email: "admin@gpsmanipur.com",
-          avatar: "https://github.com/shadcn.png",
-        }} />
+        {authUser ? <NavUser user={user} /> : null}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

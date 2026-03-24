@@ -3,6 +3,17 @@ import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "ax
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
 
+const showErrorToast = async (message: string) => {
+  if (typeof window === "undefined") return;
+
+  try {
+    const { toast } = await import("sonner");
+    toast.error(message, { id: "api-error-429" });
+  } catch {
+    // Keep API layer resilient even if toast import fails.
+  }
+};
+
 const apiInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
@@ -16,12 +27,16 @@ apiInstance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     const status = error.response?.status;
+    const errorData = error.response?.data as { message?: string } | undefined;
+    const message = errorData?.message || "Something went wrong. Please try again.";
 
     if (status === 401) {
       console.warn("Session expired or unauthorized request.");
       // Optional: Redirect to login or clear app state
     } else if (status === 403) {
       console.error("Access forbidden: You don't have permissions.");
+    } else if (status === 429) {
+      void showErrorToast(message);
     } else if (status === 500) {
       console.error("Internal Server Error: Something went wrong on the backend.");
     }

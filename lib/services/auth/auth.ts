@@ -2,7 +2,7 @@ import { api } from "../api/api";
 import { ApiResponse } from "../api/types";
 import type { SignInWithOtp, SignInWithOtpResponse, VerifyOtp, VerifyOtpResponse, LoginProvider, SessionResponse } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1").replace(/\/$/, "");
 
 const signWithOtp = async ({ email, type }: SignInWithOtp): Promise<ApiResponse<SignInWithOtpResponse>> => {
     try {
@@ -31,16 +31,39 @@ const verifyOtp = async ({ email, otp }: VerifyOtp): Promise<VerifyOtpResponse> 
 };
 
 const googleLogin = async (callbackURL: string = `${typeof window !== "undefined" ? window.location.origin : ""}/login?provider=google`) => {
+    if (typeof window === "undefined") {
+        throw new Error("Google sign in must be started in the browser");
+    }
+
     try {
-        const response = await api.post<{ url: string }>("/auth/sign-in/social", {
-            provider: "google",
-            callbackURL,
+        const response = await fetch(`${API_URL}/auth/sign-in/social`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                provider: "google",
+                callbackURL,
+            }),
         });
-        if (typeof window !== "undefined" && response?.url) {
-            window.location.href = response.url;
+
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok) {
+            const message = payload?.message || payload?.error || "Failed to initiate Google sign in";
+            throw new Error(message);
         }
+
+        const redirectURL = payload?.url || payload?.data?.url;
+        if (!redirectURL) {
+            throw new Error("OAuth redirect URL was not returned by server");
+        }
+
+        window.location.assign(redirectURL);
     } catch (error: any) {
-        throw new Error(error.response?.data?.message || "Failed to initiate Google sign in");
+        throw new Error(error?.message || "Failed to initiate Google sign in");
     }
 };
 

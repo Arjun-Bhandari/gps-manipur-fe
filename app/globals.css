@@ -52,6 +52,8 @@
 }
 
 :root {
+  --radius: 0.9rem;
+
   /* Cupertino Scholar Light Palette */
   --background: oklch(0.985 0.003 264); /* #FBFBFD */
   --foreground: oklch(0.145 0.01 264);  /* #1D1D1F */
@@ -71,6 +73,10 @@
   --border: oklch(0.91 0.01 264);      /* #E5E5EA */
   --input: oklch(0.91 0.01 264);
   --ring: oklch(0.53 0.22 260 / 0.5);
+
+  /* Shared elevation tokens */
+  --shadow-soft: 0 1px 2px oklch(0.18 0.01 264 / 0.05), 0 8px 20px oklch(0.18 0.01 264 / 0.05);
+  --shadow-surface: 0 2px 8px oklch(0.18 0.01 264 / 0.06), 0 12px 28px oklch(0.18 0.01 264 / 0.06);
   
   /* Sidebar Tokens */
   --sidebar: oklch(0.985 0.003 264);
@@ -104,6 +110,10 @@
   --input: oklch(0.28 0.01 264);
   --ring: oklch(0.65 0.22 260 / 0.4);
 
+  /* Shared elevation tokens - dark */
+  --shadow-soft: 0 1px 2px oklch(0.05 0 0 / 0.45), 0 8px 20px oklch(0.05 0 0 / 0.35);
+  --shadow-surface: 0 2px 8px oklch(0.05 0 0 / 0.5), 0 12px 28px oklch(0.05 0 0 / 0.4);
+
   /* Sidebar Tokens - Dark Mode */
   --sidebar: oklch(0.18 0.01 264);      /* Slightly lighter than background */
   --sidebar-foreground: oklch(0.96 0.005 264);
@@ -131,5 +141,24 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  [data-slot="card"],
+  [data-slot="sheet-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="alert-dialog-content"] {
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-surface);
+    background-color: color-mix(in srgb, var(--card) 94%, transparent);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    backdrop-filter: saturate(160%) blur(14px);
+  }
+
+  [data-slot="button"],
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="select-trigger"] {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
   }
 }

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { onboardingService } from "@/lib/services/auth/onboarding";
 import { useAuthStore } from "@/lib/store/authStore";
 import FullLogo from "@/components/fulllogo";
+import { toast } from "sonner";
 
 export default function OnboardingPage() {
     const router = useRouter();
@@ -44,7 +45,9 @@ export default function OnboardingPage() {
             await onboardingService.onBoarding(formData);
             router.push("/dashboard");
         } catch (err: any) {
-            setError(err.message || "Failed to complete onboarding. Please try again.");
+            const message = err.message || "Failed to complete onboarding. Please try again.";
+            setError(message);
+            toast.error(message);
             setIsLoading(false);
         }
     };
