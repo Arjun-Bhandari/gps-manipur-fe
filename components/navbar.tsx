@@ -6,10 +6,12 @@ import FullLogo from './fulllogo'
 import { Button } from '@/components/ui/button'
 import Container from './container'
 import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/lib/store/authStore'
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const router = useRouter()
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
     const navItems = [
         { label: 'Home', href: '/' },
@@ -37,8 +39,14 @@ const Navbar = () => {
                     </div>
 
                     <div className='hidden items-center gap-3 md:flex'>
-                        <Button variant="ghost" size="lg" className="rounded-full font-medium">Log in</Button>
-                        <Button size="lg" className="rounded-full px-5 font-semibold shadow-md shadow-primary/10" onClick={() => router.push('/dashboard')}>Join Now</Button>
+                        {!isAuthenticated ? (
+                            <>
+                                <Button variant="ghost" size="lg" className="rounded-full font-medium" onClick={() => router.push('/login')}>Log in</Button>
+                                <Button size="lg" className="rounded-full px-5 font-semibold shadow-md shadow-primary/10" onClick={() => router.push('/login')}>Join Now</Button>
+                            </>
+                        ) : (
+                            <Button size="lg" className="rounded-full px-5 font-semibold shadow-md shadow-primary/10" onClick={() => router.push('/dashboard')}>Dashboard</Button>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -90,8 +98,14 @@ const Navbar = () => {
                             </Link>
                         ))}
                         <div className="mt-2 grid grid-cols-2 gap-2 p-2">
-                            <Button variant="ghost" className="rounded-xl h-12">Log in</Button>
-                            <Button className="rounded-xl h-12 shadow-lg shadow-primary/20">Join Now</Button>
+                            {!isAuthenticated ? (
+                                <>
+                                    <Button variant="ghost" className="rounded-xl h-12" onClick={() => { setIsMobileMenuOpen(false); router.push('/login') }}>Log in</Button>
+                                    <Button className="rounded-xl h-12 shadow-lg shadow-primary/20" onClick={() => { setIsMobileMenuOpen(false); router.push('/login') }}>Join Now</Button>
+                                </>
+                            ) : (
+                                <Button className="col-span-2 rounded-xl h-12 shadow-lg shadow-primary/20" onClick={() => { setIsMobileMenuOpen(false); router.push('/dashboard') }}>Dashboard</Button>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -7,8 +7,12 @@ import { YouTube } from '@/lib/icons'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { useAuthStore } from '@/lib/store/authStore'
+
 const HeroSection = () => {
     const router = useRouter()
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+    
     return (
         <section className='relative w-full'>
 
@@ -40,7 +44,7 @@ const HeroSection = () => {
                                 <Button
                                     variant='default'
                                     className='group w-full h-14 px-8 text-lg font-bold transition-all duration-500 rounded-full shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.05] active:scale-[0.98] sm:w-auto bg-primary text-primary-foreground'
-                                    onClick={() => router.push('/dashboard')}
+                                    onClick={() => router.push(isAuthenticated ? '/dashboard' : '/login')}
                                 >
                                     Start Learning
                                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />

@@ -34,9 +34,14 @@ export const useAuthStore = create<AuthState>()(
                     set({ user: null, isAuthenticated: false, isLoading: false, error: error.message });
                 }
             },
-            logout: () => {
-                // You can add api.post("/auth/sign-out") here if you have a sign-out method in authService
-                set({ user: null, isAuthenticated: false });
+            logout: async () => {
+                try {
+                    await authService.logOut();
+                } catch (error) {
+                    console.error("Logout failed", error);
+                } finally {
+                    set({ user: null, isAuthenticated: false });
+                }
             },
         }),
         {

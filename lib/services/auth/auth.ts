@@ -66,6 +66,14 @@ const getLastUsedProvider = (): LoginProvider | null => {
     return null;
 };
 
+const logOut = () => {
+    try {
+        const response = api.post("/auth/sign-out", {});
+        return response;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.message || "Failed to logout");
+    }
+}
 export const authService = {
     signWithOtp,
     verifyOtp,
@@ -73,4 +81,5 @@ export const authService = {
     getSession,
     setLastUsedProvider,
     getLastUsedProvider,
+    logOut
 };

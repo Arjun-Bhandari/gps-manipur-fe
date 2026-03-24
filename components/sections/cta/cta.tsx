@@ -1,9 +1,14 @@
+'use client'
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { YouTube } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
+import { useAuthStore } from '@/lib/store/authStore'
 
 const Cta = () => {
+  const router = useRouter()
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   return (
     <section className='w-full relative z-10 py-6 sm:py-8 md:py-10 lg:py-12'>
       <div className='container mx-auto px-4 sm:px-6'>
@@ -47,7 +52,11 @@ const Cta = () => {
                 </a>
               </Button>
 
-              <Button variant="ghost" className="rounded-full h-14 px-8 text-lg font-medium">
+              <Button
+                variant="ghost"
+                className="rounded-full h-14 px-8 text-lg font-medium"
+                onClick={() => router.push(isAuthenticated ? '/dashboard' : '/login')}
+              >
                 View Courses
               </Button>
             </div>
