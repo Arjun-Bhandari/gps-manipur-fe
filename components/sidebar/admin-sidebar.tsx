@@ -28,6 +28,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { NavUser } from "./nav-user"
+import { useSessionQuery } from "@/lib/services/auth/auth.queries"
 import { useAuthStore } from "@/lib/store/authStore"
 
 const data = {
@@ -68,18 +69,13 @@ const data = {
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const authUser = useAuthStore((state) => state.user)
-  const checkSession = useAuthStore((state) => state.checkSession)
-
-  React.useEffect(() => {
-    if (!authUser) {
-      void checkSession()
-    }
-  }, [authUser, checkSession])
+  const sessionQuery = useSessionQuery(!authUser)
+  const resolvedUser = authUser ?? sessionQuery.data?.user ?? null
 
   const user = {
-    name: authUser?.name || "",
-    email: authUser?.email || "",
-    avatar: authUser?.image || "",
+    name: resolvedUser?.name || "",
+    email: resolvedUser?.email || "",
+    avatar: resolvedUser?.image || "",
   }
 
   return (
@@ -118,7 +114,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        {authUser ? <NavUser user={user} /> : null}
+        {resolvedUser ? <NavUser user={user} /> : null}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

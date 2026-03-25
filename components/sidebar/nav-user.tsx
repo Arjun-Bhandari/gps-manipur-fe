@@ -28,8 +28,10 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar"
+import { useLogoutMutation } from "@/lib/services/auth/auth.queries"
 import { useAuthStore } from "@/lib/store/authStore"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function NavUser({
     user,
@@ -41,7 +43,8 @@ export function NavUser({
     }
 }) {
     const { isMobile } = useSidebar()
-    const logout = useAuthStore((state) => state.logout)
+    const clearUser = useAuthStore((state) => state.clearUser)
+    const logoutMutation = useLogoutMutation()
     const router = useRouter()
 
     const userInitials = (() => {
@@ -57,8 +60,15 @@ export function NavUser({
     })()
 
     const handleLogout = async () => {
-        await logout()
-        router.push("/login")
+        try {
+            await logoutMutation.mutateAsync()
+            clearUser()
+            toast.success("Logged out successfully.")
+            router.push("/login")
+        } catch (error: any) {
+            const message = error?.message || "Failed to log out. Please try again."
+            toast.error(message)
+        }
     }
 
     return (

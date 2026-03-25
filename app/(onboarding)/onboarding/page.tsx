@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { onboardingService } from "@/lib/services/auth/onboarding";
+import { useOnboardingMutation } from "@/lib/services/auth/auth.queries";
 import { useAuthStore } from "@/lib/store/authStore";
 import FullLogo from "@/components/fulllogo";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 export default function OnboardingPage() {
     const router = useRouter();
     const user = useAuthStore((state) => state.user);
+    const onboardingMutation = useOnboardingMutation();
 
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +43,8 @@ export default function OnboardingPage() {
         setIsLoading(true);
 
         try {
-            await onboardingService.onBoarding(formData);
+            await onboardingMutation.mutateAsync(formData);
+            toast.success("Onboarding completed successfully.");
             router.push("/dashboard");
         } catch (err: any) {
             const message = err.message || "Failed to complete onboarding. Please try again.";

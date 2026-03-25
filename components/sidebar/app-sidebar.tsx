@@ -33,6 +33,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { NavUser } from "./nav-user"
+import { useSessionQuery } from "@/lib/services/auth/auth.queries"
 import { useAuthStore } from "@/lib/store/authStore"
 
 interface NavItem {
@@ -43,7 +44,6 @@ interface NavItem {
   items?: NavItem[]
 }
 
-// This is sample data.
 const data: {
   navMain: NavItem[]
 } = {
@@ -113,19 +113,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const [isArticlesOpen, setIsArticlesOpen] = React.useState(true)
   const authUser = useAuthStore((state) => state.user)
-  const checkSession = useAuthStore((state) => state.checkSession)
-
-  React.useEffect(() => {
-    if (!authUser) {
-      void checkSession()
-    }
-  }, [authUser, checkSession])
+  const sessionQuery = useSessionQuery(!authUser)
+  const resolvedUser = authUser ?? sessionQuery.data?.user ?? null
 
   const user = {
-    name: authUser?.name || "",
-    email: authUser?.email || "",
-    avatar: authUser?.image || "",
-    role: (authUser?.role || "user").toLowerCase(),
+    name: resolvedUser?.name || "",
+    email: resolvedUser?.email || "",
+    avatar: resolvedUser?.image || "",
+    role: (resolvedUser?.role || "user").toLowerCase(),
   }
 
   return (
@@ -213,7 +208,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       </SidebarContent>
       <SidebarFooter>
-        {authUser ? <NavUser user={user} /> : null}
+        {resolvedUser ? <NavUser user={user} /> : null}
       </SidebarFooter>
       <SidebarRail />
 

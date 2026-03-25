@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authService } from "@/lib/services/auth/auth";
+import {
+    useGoogleSignInMutation,
+    useSendOtpMutation,
+    useSessionQuery,
+    useVerifyOtpMutation,
+} from "@/lib/services/auth/auth.queries";
 import { useAuthStore } from "@/lib/store/authStore";
 import FullLogo from "@/components/fulllogo";
 import { toast } from "sonner";
@@ -20,10 +26,14 @@ export default function LoginPage() {
     const [step, setStep] = useState<"email" | "otp">("email");
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const [lastUsedProvider, setLastUsedProvider] = useState<"google" | "email-otp" | null>(null);
+    const [googleCallbackHandled, setGoogleCallbackHandled] = useState(false);
+
+    const sendOtpMutation = useSendOtpMutation();
+    const verifyOtpMutation = useVerifyOtpMutation();
+    const googleSignInMutation = useGoogleSignInMutation();
+    const isGoogleCallback = searchParams.get("provider") === "google";
+    const googleSessionQuery = useSessionQuery(isGoogleCallback && !googleCallbackHandled);
 
     const extractErrorMessage = (err: any, fallback: string) => {
         if (err?.message) return err.message;
@@ -31,63 +41,80 @@ export default function LoginPage() {
         return fallback;
     };
 
-    // Check callback status
+    const isFormPending = sendOtpMutation.isPending || verifyOtpMutation.isPending;
+    const isGoogleLoading = googleSignInMutation.isPending || (isGoogleCallback && !googleCallbackHandled && googleSessionQuery.isPending);
+
+    const pageError =
+        sendOtpMutation.error ||
+        verifyOtpMutation.error ||
+        googleSignInMutation.error ||
+        (isGoogleCallback ? googleSessionQuery.error : null);
+
+    const errorMessage = pageError ? extractErrorMessage(pageError, "Something went wrong. Please try again.") : null;
+
     useEffect(() => {
         setLastUsedProvider(authService.getLastUsedProvider());
+    }, []);
 
-        const provider = searchParams.get("provider");
-        if (provider === "google") {
-            setIsGoogleLoading(true);
-            authService.getSession().then((response) => {
-                if (response?.session) {
-                    authService.setLastUsedProvider("google");
-                    setLastUsedProvider("google");
-                    setUser(response.user);
-                    toast.success("Google login successful.");
-                    router.push(response.user.isOnboarded ? "/dashboard" : "/onboarding");
-                } else {
-                    setIsGoogleLoading(false);
-                    const message = "Google sign-in failed or was cancelled.";
-                    setError(message);
-                    toast.error(message);
-                }
-            }).catch((err: any) => {
-                setIsGoogleLoading(false);
-                const message = extractErrorMessage(err, "An error occurred verifying your session.");
-                setError(message);
-                toast.error(message);
-            });
+    useEffect(() => {
+        if (!isGoogleCallback || googleCallbackHandled) {
+            return;
         }
-    }, [searchParams, router]);
+
+        if (googleSessionQuery.isError) {
+            const message = extractErrorMessage(googleSessionQuery.error, "An error occurred verifying your session.");
+            toast.error(message);
+            setGoogleCallbackHandled(true);
+            return;
+        }
+
+        if (googleSessionQuery.isSuccess) {
+            if (googleSessionQuery.data?.session) {
+                authService.setLastUsedProvider("google");
+                setLastUsedProvider("google");
+                setUser(googleSessionQuery.data.user);
+                toast.success("Google login successful.");
+                setGoogleCallbackHandled(true);
+                router.push(googleSessionQuery.data.user.isOnboarded ? "/dashboard" : "/onboarding");
+                return;
+            }
+
+            const message = "Google sign-in failed or was cancelled.";
+            toast.error(message);
+            setGoogleCallbackHandled(true);
+        }
+    }, [
+        googleSessionQuery.data,
+        googleSessionQuery.error,
+        googleSessionQuery.isError,
+        googleSessionQuery.isPending,
+        googleSessionQuery.isSuccess,
+        googleCallbackHandled,
+        isGoogleCallback,
+        router,
+        setUser,
+    ]);
 
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setIsLoading(true);
         try {
-            await authService.signWithOtp({ email, type: "sign-in" });
+            await sendOtpMutation.mutateAsync({ email, type: "sign-in" });
             setStep("otp");
             setLastUsedProvider("email-otp");
             toast.success("Verification code sent to your email.");
         } catch (err: any) {
             const message = extractErrorMessage(err, "Failed to send OTP. Please try again.");
-            setError(message);
             toast.error(message);
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setIsLoading(true);
         try {
-            const response = await authService.verifyOtp({
+            const response = await verifyOtpMutation.mutateAsync({
                 email,
                 otp,
             });
-            // The authService auto-sets the last used provider to email-otp internally.
             if (response?.user) {
                 setUser(response.user);
                 toast.success("Login successful.");
@@ -99,23 +126,16 @@ export default function LoginPage() {
             }
         } catch (err: any) {
             const message = extractErrorMessage(err, "Invalid OTP. Please try again.");
-            setError(message);
             toast.error(message);
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const handleGoogleSignIn = async () => {
-        setIsGoogleLoading(true);
-        setError(null);
         try {
-            await authService.googleLogin(`${window.location.origin}/login?provider=google`);
+            await googleSignInMutation.mutateAsync(`${window.location.origin}/login?provider=google`);
         } catch (err: any) {
             const message = extractErrorMessage(err, "Could not initiate Google sign in.");
-            setError(message);
             toast.error(message);
-            setIsGoogleLoading(false);
         }
     };
 
@@ -190,13 +210,13 @@ export default function LoginPage() {
                         </div>
 
                         <div className="space-y-6">
-                            {error && (
+                            {errorMessage && (
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className="bg-destructive/15 text-destructive text-sm p-3 rounded-md text-center mb-6"
                                 >
-                                    {error}
+                                    {errorMessage}
                                 </motion.div>
                             )}
 
@@ -206,7 +226,7 @@ export default function LoginPage() {
                                         variant="outline"
                                         className="w-full relative h-11"
                                         onClick={handleGoogleSignIn}
-                                        disabled={isGoogleLoading || isLoading}
+                                        disabled={isGoogleLoading || isFormPending}
                                     >
                                         {isGoogleLoading ? (
                                             <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -267,8 +287,8 @@ export default function LoginPage() {
                                                 )}
                                             </div>
                                             <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="pt-2">
-                                                <Button type="submit" className="w-full h-11" disabled={isLoading}>
-                                                    {isLoading ? "Sending code..." : "Send Verification Code"}
+                                                <Button type="submit" className="w-full h-11" disabled={isFormPending}>
+                                                    {sendOtpMutation.isPending ? "Sending code..." : "Send Verification Code"}
                                                 </Button>
                                             </motion.div>
                                         </motion.form>
@@ -308,8 +328,8 @@ export default function LoginPage() {
                                                 </p>
                                             </div>
                                             <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="pt-2">
-                                                <Button type="submit" className="w-full h-11" disabled={isLoading}>
-                                                    {isLoading ? "Verifying..." : "Sign In"}
+                                                <Button type="submit" className="w-full h-11" disabled={isFormPending}>
+                                                    {verifyOtpMutation.isPending ? "Verifying..." : "Sign In"}
                                                 </Button>
                                             </motion.div>
                                         </motion.form>
