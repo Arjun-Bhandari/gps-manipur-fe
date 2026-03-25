@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -20,19 +20,18 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const setUser = useAuthStore((state) => state.setUser);
 
     const [step, setStep] = useState<"email" | "otp">("email");
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [lastUsedProvider, setLastUsedProvider] = useState<"google" | "email-otp" | null>(null);
+    const [isGoogleCallback, setIsGoogleCallback] = useState(false);
     const [googleCallbackHandled, setGoogleCallbackHandled] = useState(false);
 
     const sendOtpMutation = useSendOtpMutation();
     const verifyOtpMutation = useVerifyOtpMutation();
     const googleSignInMutation = useGoogleSignInMutation();
-    const isGoogleCallback = searchParams.get("provider") === "google";
     const googleSessionQuery = useSessionQuery(isGoogleCallback && !googleCallbackHandled);
 
     const extractErrorMessage = (err: any, fallback: string) => {
@@ -54,6 +53,8 @@ export default function LoginPage() {
 
     useEffect(() => {
         setLastUsedProvider(authService.getLastUsedProvider());
+        const provider = new URLSearchParams(window.location.search).get("provider");
+        setIsGoogleCallback(provider === "google");
     }, []);
 
     useEffect(() => {
